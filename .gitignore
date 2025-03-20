@@ -56,3 +56,6 @@ macos/Runner/GoogleService-Info.plist
 
 # env
 .env
+
+# image
+/assets
