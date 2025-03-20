@@ -8,4 +8,4 @@ A new Flutter project.
 의존성 업데이트 및 점검 자동화:
 ```bash
 sh scripts/flutter_dependency_check.sh
-
+```
