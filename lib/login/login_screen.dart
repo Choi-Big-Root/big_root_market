@@ -17,17 +17,19 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Text(
-            'BigRoot 마트',
-            style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 150),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 36),
-            child: Form(
+      resizeToAvoidBottomInset: false,
+      body: Padding(
+        padding: const EdgeInsets.all(48.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset('assets/fastcampus_logo.png'), // 여기서 부터 진행.
+            const Text(
+              'BigRoot 마트',
+              style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 64),
+            Form(
               key: _formKey,
               child: Column(
                 children: [
@@ -52,6 +54,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       hintText: '비밀번호',
                       border: OutlineInputBorder(),
                     ),
+                    obscureText: true,
+                    keyboardType: TextInputType.visiblePassword,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return '비밀번호를 입력 하세요.';
@@ -62,11 +66,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 ],
               ),
             ),
-          ),
-          const SizedBox(height: 24,),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 36),
-            child: MaterialButton(
+            const SizedBox(height: 24,),
+            MaterialButton(
               onPressed: () {},
               color: Colors.red,
               minWidth: double.infinity,
@@ -76,9 +77,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 style: TextStyle(color: Colors.white, fontSize: 18),
               ),
             ),
-          ),
-          TextButton(onPressed: () {}, child: const Text('계정이 없나요? 회원가입')),
-        ],
+            TextButton(onPressed: () {}, child: const Text('계정이 없나요? 회원가입')),
+            const Divider(),
+            Image.asset('assets/btn_google_signin.png')
+          ],
+        ),
       ),
     );
   }
