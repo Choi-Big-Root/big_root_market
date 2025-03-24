@@ -1,3 +1,4 @@
+import 'package:big_root_market/home/product_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 
@@ -90,7 +91,30 @@ class _HomeWidgetState extends State<HomeWidget> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                Container(height: 240, color: Colors.orange),
+                Container(
+                  height: 240,
+                  color: Colors.orange,
+                  child: ListView.builder(
+                    itemCount: 10,
+                    scrollDirection: Axis.horizontal, //이게 빠지면 문제가 발생.
+                    itemBuilder: (context, index) {
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const ProductDetailScreen(),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          width: 160,
+                          margin: const EdgeInsets.only(right: 16),
+                          decoration: const BoxDecoration(color: Colors.grey),
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ],
             ),
           ),

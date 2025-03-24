@@ -41,8 +41,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       border: OutlineInputBorder(),
                     ),
                     validator: (value) {
-                      if (value == null || value.isEmpty){ return '이메일을 입력 하세요.';}
-                      if (value.contains('@')){return '이메일 형식이 아닙니다.';}
+                      if (value == null || value.isEmpty) {
+                        return '이메일을 입력 하세요.';
+                      }
+                      if (value.contains('@')) {
+                        return '이메일 형식이 아닙니다.';
+                      }
                       return null; // 정상일경우 로직은 아직 대기.
                     },
                   ),
@@ -66,9 +70,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 24,),
+            const SizedBox(height: 24),
             MaterialButton(
-              onPressed: () {},
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  _formKey.currentState!.save(); // 각 필드 별 onSaved() 호출.
+                  debugPrint('실패?');
+                }
+              },
               color: Colors.red,
               minWidth: double.infinity,
               height: 48,
@@ -79,7 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             TextButton(onPressed: () {}, child: const Text('계정이 없나요? 회원가입')),
             const Divider(),
-            Image.asset('assets/btn_google_signin.png')
+            Image.asset('assets/btn_google_signin.png'),
           ],
         ),
       ),
