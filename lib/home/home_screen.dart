@@ -1,3 +1,4 @@
+import 'package:big_root_market/home/widgets/home_widget.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -24,11 +25,32 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: IndexedStack(
         index: _menuindex,
-        children: [
-          Container(color: Colors.grey),
-          Container(color: Colors.indigo),
-        ],
+        children: [const HomeWidget(), Container(color: Colors.indigo)],
       ),
+      floatingActionButton:
+      // _menuindex == 0
+      //     ? FloatingActionButton(
+      //       onPressed: () {},
+      //       child: const Icon(Icons.shopping_cart_outlined),
+      //     )
+      //     : _menuindex == 1
+      //     ? FloatingActionButton(
+      //       onPressed: () {},
+      //       child: const Icon(Icons.add),
+      //     )
+      //     : Container(),
+      switch (_menuindex) {
+        0 => FloatingActionButton(
+          onPressed: () {},
+          child: const Icon(Icons.shopping_cart_outlined),
+        ),
+        1 => FloatingActionButton(
+          onPressed: () {},
+          child: const Icon(Icons.add),
+        ),
+        _ => Container(),
+      },
+
       bottomNavigationBar: NavigationBar(
         selectedIndex: _menuindex,
         onDestinationSelected: (index) {
