@@ -118,6 +118,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         //go() 현재화면을 경로에 맞는 화면으로 변경하는 개념.
                         //go_router 패키지를 사용한다면 pop을 실행후 push를 해야 동일한기능을 할것으로 생각.
                         context.go('/login');
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('회원가입에 실패 하였습니다..')),
+                        );
                       }
                     }
                   },
