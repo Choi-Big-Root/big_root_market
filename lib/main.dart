@@ -27,7 +27,8 @@ void main() async {
 
   if (kDebugMode) {
     try {
-      await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+      //구글 로그인은 localemulator에서 동작하지 않아 임시로 주석처리.
+      //await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
       FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
       //final supabase = Supabase.instance.client;
     } catch (e) {

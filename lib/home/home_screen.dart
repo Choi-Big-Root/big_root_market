@@ -49,9 +49,11 @@ class _HomeScreenState extends State<HomeScreen> {
       switch (_menuindex) {
         0 => FloatingActionButton(
           onPressed: () {
-            Navigator.of(
-              context,
-            ).push(MaterialPageRoute(builder: (context) => const CartScreen()));
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => const CartScreen(uid: ''),
+              ),
+            );
           },
           child: const Icon(Icons.shopping_cart_outlined),
         ),
