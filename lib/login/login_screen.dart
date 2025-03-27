@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -9,11 +11,41 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController emailTextEditingController =
-      TextEditingController();
-  final TextEditingController pwdTextEditingController =
-      TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  String _email = '';
+  String _password = '';
+
+  Future<UserCredential?> signIn(String email, String password) async {
+    try {
+      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      return credential;
+    } on FirebaseAuthException catch (e) {
+      debugPrint(e.toString());
+      return null;
+    } catch (e) {
+      debugPrint(e.toString());
+      return null;
+    }
+  }
+
+  Future<UserCredential> signInWithGoogle() async {
+    //구글 로그인
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+    //구글 인증이 되었는지.
+    final GoogleSignInAuthentication? googleAuth =
+        await googleUser?.authentication;
+
+    final credential = await GoogleAuthProvider.credential(
+      accessToken: googleAuth?.accessToken,
+      idToken: googleAuth?.idToken,
+    );
+
+    return await FirebaseAuth.instance.signInWithCredential(credential);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +67,6 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 children: [
                   TextFormField(
-                    controller: emailTextEditingController,
                     decoration: const InputDecoration(
                       labelText: '이메일',
                       hintText: '이메일',
@@ -45,15 +76,15 @@ class _LoginScreenState extends State<LoginScreen> {
                       if (value == null || value.isEmpty) {
                         return '이메일을 입력 하세요.';
                       }
-                      if (value.contains('@')) {
+                      if (!value.contains('@')) {
                         return '이메일 형식이 아닙니다.';
                       }
                       return null; // 정상일경우 로직은 아직 대기.
                     },
+                    onSaved: (value) => _email = value!.trim(),
                   ),
                   const SizedBox(height: 24),
                   TextFormField(
-                    controller: pwdTextEditingController,
                     decoration: const InputDecoration(
                       labelText: '비밀번호',
                       hintText: '비밀번호',
@@ -67,16 +98,31 @@ class _LoginScreenState extends State<LoginScreen> {
                       }
                       return null;
                     },
+                    onSaved: (value) => _password = value!.trim(),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 24),
             MaterialButton(
-              onPressed: () {
+              onPressed: () async {
                 if (_formKey.currentState!.validate()) {
                   _formKey.currentState!.save(); // 각 필드 별 onSaved() 호출.
-                  debugPrint('실패?');
+
+                  final result = await signIn(_email, _password);
+
+                  if (!context.mounted) return;
+                  //실패시 동작
+                  if (result == null) {
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(const SnackBar(content: Text('로그인 실패')));
+                    return;
+                  }
+
+                  //성공시 동작
+                  debugPrint('BIGROOT : 로그인 성공');
+                  context.go('/');
                 }
               },
               color: Colors.red,
@@ -97,7 +143,12 @@ class _LoginScreenState extends State<LoginScreen> {
               child: const Text('계정이 없나요? 회원가입'),
             ),
             const Divider(),
-            Image.asset('assets/btn_google_signin.png'),
+            InkWell(
+              onTap: () async {
+                final result = await signInWithGoogle();
+              },
+              child: Image.asset('assets/btn_google_signin.png'),
+            ),
           ],
         ),
       ),
