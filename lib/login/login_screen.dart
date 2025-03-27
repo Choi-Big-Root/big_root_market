@@ -31,7 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Future<UserCredential> signInWithGoogle() async {
+  Future<UserCredential?> signInWithGoogle() async {
     //구글 로그인
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
@@ -146,6 +146,16 @@ class _LoginScreenState extends State<LoginScreen> {
             InkWell(
               onTap: () async {
                 final result = await signInWithGoogle();
+
+                if (!context.mounted) return;
+                if (result == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('구글 로그인에 실패하였습니다.')),
+                  );
+                }
+
+                debugPrint('BIG ROOT: 구글 로그인 성공');
+                context.go('/');
               },
               child: Image.asset('assets/btn_google_signin.png'),
             ),
