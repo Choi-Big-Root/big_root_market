@@ -33,6 +33,7 @@ dependencies:
   #firebase_storage: 유료화 되면서 supabase_flutter로 대체하여 사용할 예정.
   supabase_flutter: ^2.8.4
   flutter_dotenv: ^5.2.1
+  camera: ^0.11.1
 
 dev_dependencies:
   flutter_test:
