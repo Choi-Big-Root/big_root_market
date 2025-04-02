@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:big_root_market/home/camera_example.dart';
 import 'package:big_root_market/model/category.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -38,6 +39,14 @@ class _ProductAddScreenState extends State<ProductAddScreen> {
       appBar: AppBar(
         title: const Text('상품추가'),
         actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const CameraExample()),
+              );
+            },
+            icon: const Icon(Icons.camera),
+          ),
           IconButton(
             onPressed: () {},
             icon: const Icon(Icons.batch_prediction_outlined),

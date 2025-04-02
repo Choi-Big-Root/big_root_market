@@ -15,13 +15,13 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-late List<CameraDescription> _cameras;
+late List<CameraDescription> cameras;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load();
 
-  _cameras = await availableCameras();
+  cameras = await availableCameras();
 
   //firebase Storage 가 무료버전이 없어 대체가능한 supabase를 사용.
   await Supabase.initialize(
