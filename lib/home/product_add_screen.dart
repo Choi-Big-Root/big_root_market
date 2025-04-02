@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:big_root_market/home/camera_example.dart';
@@ -18,13 +19,11 @@ class _ProductAddScreenState extends State<ProductAddScreen> {
   final GlobalKey _formKey = GlobalKey<FormState>();
   bool _isDisCount = false;
 
-  String dropDownValue = 'test1'; //대기
-
   final db = FirebaseFirestore.instance;
   final supabase = Supabase.instance.client;
   Uint8List? imageData;
   XFile? image;
-  Category? category;
+  Category? selectedCategory;
 
   final TextEditingController titleTextEditingController =
       TextEditingController();
@@ -32,6 +31,45 @@ class _ProductAddScreenState extends State<ProductAddScreen> {
       TextEditingController();
   TextEditingController priceTextEditingController = TextEditingController();
   TextEditingController countTextEditingController = TextEditingController();
+  List<Category> categorise = [];
+
+  Future<List<Category>> _fecthCategories() async {
+    final reps = await db.collection('categories').get();
+    for (var doc in reps.docs) {
+      debugPrint(doc.get('title'));
+      debugPrint(doc.id);
+      categorise.add(
+        Category.fromJson({'title': doc.get('title'), 'docId': doc.id}),
+      );
+
+      debugPrint(categorise.toString());
+    }
+    return categorise;
+  }
+
+  Future addProduct() async {
+    if (imageData != null) {
+      final file = File(image!.path);
+      final String fileName =
+          '${DateTime.now().millisecondsSinceEpoch}_${image!.name}';
+      await supabase.storage.from('images').upload(fileName, file);
+      print(file);
+      print(fileName);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fecthCategories()
+        .then((_) {
+          selectedCategory = categorise.first;
+          setState(() {});
+        })
+        .catchError((e) {
+          debugPrint(e.toString());
+        });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +89,12 @@ class _ProductAddScreenState extends State<ProductAddScreen> {
             onPressed: () {},
             icon: const Icon(Icons.batch_prediction_outlined),
           ),
-          IconButton(onPressed: () {}, icon: const Icon(Icons.add_outlined)),
+          IconButton(
+            onPressed: () {
+              addProduct();
+            },
+            icon: const Icon(Icons.add_outlined),
+          ),
         ],
       ),
       body: SingleChildScrollView(
@@ -193,25 +236,26 @@ class _ProductAddScreenState extends State<ProductAddScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      DropdownButton(
-                        isExpanded: true,
-                        value: dropDownValue,
-                        items: const [
-                          DropdownMenuItem(
-                            value: 'test1',
-                            child: Text('Test1'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'test2',
-                            child: Text('Test2'),
-                          ),
-                        ],
-                        onChanged: (value) {
-                          setState(() {
-                            dropDownValue = value!;
-                          });
-                        },
-                      ),
+                      categorise.isNotEmpty
+                          ? DropdownButton<Category>(
+                            isExpanded: true,
+                            value: selectedCategory,
+                            items:
+                                categorise
+                                    .map(
+                                      (e) => DropdownMenuItem<Category>(
+                                        value: e,
+                                        child: Text('${e.title}'),
+                                      ),
+                                    )
+                                    .toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                selectedCategory = value!;
+                              });
+                            },
+                          )
+                          : const Center(child: Text('로딩중....')),
                     ],
                   ),
                 ),
