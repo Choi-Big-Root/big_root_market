@@ -15,6 +15,7 @@ sealed class Product with _$Product {
     double? saleRate,
     String? imgUrl,
     int? timeStamp,
+    String? categoryDocId,
   }) = _Product;
   //여기까지가 기본적인 freezed 이고.
   factory Product.fromJson(Map<String, dynamic> json) =>

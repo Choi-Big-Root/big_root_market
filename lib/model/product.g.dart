@@ -16,6 +16,7 @@ _Product _$ProductFromJson(Map<String, dynamic> json) => _Product(
   saleRate: (json['saleRate'] as num?)?.toDouble(),
   imgUrl: json['imgUrl'] as String?,
   timeStamp: (json['timeStamp'] as num?)?.toInt(),
+  categoryDocId: json['categoryDocId'] as String?,
 );
 
 Map<String, dynamic> _$ProductToJson(_Product instance) => <String, dynamic>{
@@ -28,6 +29,7 @@ Map<String, dynamic> _$ProductToJson(_Product instance) => <String, dynamic>{
   'saleRate': instance.saleRate,
   'imgUrl': instance.imgUrl,
   'timeStamp': instance.timeStamp,
+  'categoryDocId': instance.categoryDocId,
 };
 
 _Cart _$CartFromJson(Map<String, dynamic> json) => _Cart(

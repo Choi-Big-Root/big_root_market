@@ -77,6 +77,24 @@ class _SellerWidgetState extends State<SellerWidget> {
     }
   }
 
+  Future deleteProduct(Product product) async {
+    try {
+      // 선택 카테고리에 맞는 doc 가져온다.
+      final categoryRef = _db
+          .collection('categories')
+          .doc(product.categoryDocId);
+
+      // 해당 doc의 데이터중 field product 내부 value에 product.docId와 동일한 데이터를 삭제.
+      await categoryRef.update({
+        "products": FieldValue.arrayRemove([product.docId]),
+      });
+      //products 컬렉션 내부 product.docId와 동일한 document를 삭제.
+      await _db.collection('products').doc(product.docId).delete();
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -377,11 +395,7 @@ class _SellerWidgetState extends State<SellerWidget> {
                                                 ),
                                                 PopupMenuItem(
                                                   onTap: () async {
-                                                    await FirebaseFirestore
-                                                        .instance
-                                                        .collection('products')
-                                                        .doc(item.docId)
-                                                        .delete();
+                                                    deleteProduct(item);
                                                   },
                                                   child: const Text('삭제'),
                                                 ),

@@ -58,7 +58,7 @@ class _ProductAddScreenState extends State<ProductAddScreen> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       _product = Product(
-        docId: selectedCategory!.docId,
+        //docId: selectedCategory!.docId,
         title: _title,
         description: _description,
         price: _price,
@@ -67,6 +67,7 @@ class _ProductAddScreenState extends State<ProductAddScreen> {
         saleRate: _saleRate,
         imgUrl: _imgUrl,
         timeStamp: DateTime.now().millisecondsSinceEpoch,
+        categoryDocId: selectedCategory!.docId,
       );
 
       debugPrint('저장된 상품 정보: $_product');
@@ -149,7 +150,7 @@ class _ProductAddScreenState extends State<ProductAddScreen> {
           _stock = Random().nextInt(30) + 1;
 
           _product = Product(
-            docId: selectedCategory!.docId,
+            //docId: selectedCategory!.docId,
             title: _title,
             description: _description,
             price: _price,
@@ -158,6 +159,7 @@ class _ProductAddScreenState extends State<ProductAddScreen> {
             saleRate: _saleRate,
             imgUrl: _imgUrl,
             timeStamp: DateTime.now().millisecondsSinceEpoch,
+            categoryDocId: selectedCategory!.docId,
           );
 
           // products 컬렉션에 _saveForm 함수를 통해 가공된 데이터 객체 _product 를 add
