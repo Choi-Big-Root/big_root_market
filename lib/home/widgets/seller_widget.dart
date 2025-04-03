@@ -1,5 +1,6 @@
 import 'package:big_root_market/model/product.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:flutter/material.dart';
 
 class SellerWidget extends StatefulWidget {
@@ -12,6 +13,9 @@ class SellerWidget extends StatefulWidget {
 class _SellerWidgetState extends State<SellerWidget> {
   TextEditingController searchTextEditingController = TextEditingController();
   final _db = FirebaseFirestore.instance;
+
+  //검색 데이터 마지막 값을
+  final _searchSubject = BehaviorSubject<String>();
 
   Future<List<Product>> fetchProducts() async {
     final resp = await _db.collection('products').orderBy('timeStamp').get();
@@ -30,11 +34,13 @@ class _SellerWidgetState extends State<SellerWidget> {
     return items;
   }
 
+  // rxjs의 debounceTime 개념을 사용하여 검색시에 일정 타임을 줄거고
+  // setstate가 현재는 검색어가 변경되면 바로 새로고침을 하는데 내가 보기엔 여기서 돌리는게 맞을거 같다.
   Stream<QuerySnapshot> streamProducts(String query) {
-    if (query.isNotEmpty) {
+    if (query.isEmpty) {
       return _db.collection('products').orderBy('title').snapshots();
     }
-    return _db.collection('proudcts').orderBy('title').startAt([query]).endAt([
+    return _db.collection('products').orderBy('title').startAt([query]).endAt([
       "$query\uf8ff",
     ]).snapshots();
   }
@@ -72,6 +78,18 @@ class _SellerWidgetState extends State<SellerWidget> {
   }
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _searchSubject.close();
+    searchTextEditingController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       color: Colors.white,
@@ -83,6 +101,7 @@ class _SellerWidgetState extends State<SellerWidget> {
             controller: searchTextEditingController,
             leading: const Icon(Icons.search_outlined),
             hintText: '상품명 입력',
+            onChanged: (value) => _searchSubject.add(value),
           ),
           const SizedBox(height: 10),
           Padding(
@@ -279,10 +298,11 @@ class _SellerWidgetState extends State<SellerWidget> {
             ),
           ),
           Expanded(
-            //child: FutureBuilder(
-            //future: fetchProducts(),
             child: StreamBuilder(
-              stream: streamProducts(searchTextEditingController.text),
+              //switchMap 기존 스트림에서 새로운 값이 나오면, 이전 스트림을 취소하고 새로운 스트림만 유지.
+              stream: _searchSubject
+                  .debounceTime(const Duration(milliseconds: 300))
+                  .switchMap((value) => streamProducts(value)),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const CircularProgressIndicator();

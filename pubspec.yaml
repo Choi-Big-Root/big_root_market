@@ -34,6 +34,7 @@ dependencies:
   supabase_flutter: ^2.8.4
   flutter_dotenv: ^5.2.1
   camera: ^0.11.1
+  rxdart: ^0.28.0
 
 dev_dependencies:
   flutter_test:
