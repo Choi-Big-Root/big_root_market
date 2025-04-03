@@ -166,6 +166,25 @@ class _SellerWidgetState extends State<SellerWidget> {
                               actions: [
                                 TextButton(
                                   onPressed: () async {
+                                    final List<String> categorise = [
+                                      '생수',
+                                      '라면',
+                                      '빵/쿠키',
+                                      '과일',
+                                      '유제품',
+                                      '정육',
+                                      '과자',
+                                      '아이스크림',
+                                    ];
+                                    await addCategories(categorise);
+
+                                    if (!context.mounted) return;
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text('Test 목록으로 등록'),
+                                ),
+                                TextButton(
+                                  onPressed: () async {
                                     final String lastTextFeildText =
                                         textEditingControllerList.last[0].text
                                             .trim();
