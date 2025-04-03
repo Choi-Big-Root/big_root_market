@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Product {
 
- String? get docId; String? get title; String? get description; int? get price; bool? get isSale; int? get stock; double? get saleRate; String? get imgUrl; int? get timeStamp;
+ String? get docId; String? get title; String? get description; int? get price; int? get stock; bool? get isSale; double? get saleRate; String? get imgUrl; int? get timeStamp;
 /// Create a copy of Product
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -29,16 +29,16 @@ $ProductCopyWith<Product> get copyWith => _$ProductCopyWithImpl<Product>(this as
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Product&&(identical(other.docId, docId) || other.docId == docId)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.price, price) || other.price == price)&&(identical(other.isSale, isSale) || other.isSale == isSale)&&(identical(other.stock, stock) || other.stock == stock)&&(identical(other.saleRate, saleRate) || other.saleRate == saleRate)&&(identical(other.imgUrl, imgUrl) || other.imgUrl == imgUrl)&&(identical(other.timeStamp, timeStamp) || other.timeStamp == timeStamp));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Product&&(identical(other.docId, docId) || other.docId == docId)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.price, price) || other.price == price)&&(identical(other.stock, stock) || other.stock == stock)&&(identical(other.isSale, isSale) || other.isSale == isSale)&&(identical(other.saleRate, saleRate) || other.saleRate == saleRate)&&(identical(other.imgUrl, imgUrl) || other.imgUrl == imgUrl)&&(identical(other.timeStamp, timeStamp) || other.timeStamp == timeStamp));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,docId,title,description,price,isSale,stock,saleRate,imgUrl,timeStamp);
+int get hashCode => Object.hash(runtimeType,docId,title,description,price,stock,isSale,saleRate,imgUrl,timeStamp);
 
 @override
 String toString() {
-  return 'Product(docId: $docId, title: $title, description: $description, price: $price, isSale: $isSale, stock: $stock, saleRate: $saleRate, imgUrl: $imgUrl, timeStamp: $timeStamp)';
+  return 'Product(docId: $docId, title: $title, description: $description, price: $price, stock: $stock, isSale: $isSale, saleRate: $saleRate, imgUrl: $imgUrl, timeStamp: $timeStamp)';
 }
 
 
@@ -49,7 +49,7 @@ abstract mixin class $ProductCopyWith<$Res>  {
   factory $ProductCopyWith(Product value, $Res Function(Product) _then) = _$ProductCopyWithImpl;
 @useResult
 $Res call({
- String? docId, String? title, String? description, int? price, bool? isSale, int? stock, double? saleRate, String? imgUrl, int? timeStamp
+ String? docId, String? title, String? description, int? price, int? stock, bool? isSale, double? saleRate, String? imgUrl, int? timeStamp
 });
 
 
@@ -66,15 +66,15 @@ class _$ProductCopyWithImpl<$Res>
 
 /// Create a copy of Product
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? docId = freezed,Object? title = freezed,Object? description = freezed,Object? price = freezed,Object? isSale = freezed,Object? stock = freezed,Object? saleRate = freezed,Object? imgUrl = freezed,Object? timeStamp = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? docId = freezed,Object? title = freezed,Object? description = freezed,Object? price = freezed,Object? stock = freezed,Object? isSale = freezed,Object? saleRate = freezed,Object? imgUrl = freezed,Object? timeStamp = freezed,}) {
   return _then(_self.copyWith(
 docId: freezed == docId ? _self.docId : docId // ignore: cast_nullable_to_non_nullable
 as String?,title: freezed == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,price: freezed == price ? _self.price : price // ignore: cast_nullable_to_non_nullable
+as int?,stock: freezed == stock ? _self.stock : stock // ignore: cast_nullable_to_non_nullable
 as int?,isSale: freezed == isSale ? _self.isSale : isSale // ignore: cast_nullable_to_non_nullable
-as bool?,stock: freezed == stock ? _self.stock : stock // ignore: cast_nullable_to_non_nullable
-as int?,saleRate: freezed == saleRate ? _self.saleRate : saleRate // ignore: cast_nullable_to_non_nullable
+as bool?,saleRate: freezed == saleRate ? _self.saleRate : saleRate // ignore: cast_nullable_to_non_nullable
 as double?,imgUrl: freezed == imgUrl ? _self.imgUrl : imgUrl // ignore: cast_nullable_to_non_nullable
 as String?,timeStamp: freezed == timeStamp ? _self.timeStamp : timeStamp // ignore: cast_nullable_to_non_nullable
 as int?,
@@ -88,15 +88,15 @@ as int?,
 @JsonSerializable()
 
 class _Product implements Product {
-   _Product({this.docId, this.title, this.description, this.price, this.isSale, this.stock, this.saleRate, this.imgUrl, this.timeStamp});
+   _Product({this.docId, this.title, this.description, this.price, this.stock, this.isSale, this.saleRate, this.imgUrl, this.timeStamp});
   factory _Product.fromJson(Map<String, dynamic> json) => _$ProductFromJson(json);
 
 @override final  String? docId;
 @override final  String? title;
 @override final  String? description;
 @override final  int? price;
-@override final  bool? isSale;
 @override final  int? stock;
+@override final  bool? isSale;
 @override final  double? saleRate;
 @override final  String? imgUrl;
 @override final  int? timeStamp;
@@ -114,16 +114,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Product&&(identical(other.docId, docId) || other.docId == docId)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.price, price) || other.price == price)&&(identical(other.isSale, isSale) || other.isSale == isSale)&&(identical(other.stock, stock) || other.stock == stock)&&(identical(other.saleRate, saleRate) || other.saleRate == saleRate)&&(identical(other.imgUrl, imgUrl) || other.imgUrl == imgUrl)&&(identical(other.timeStamp, timeStamp) || other.timeStamp == timeStamp));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Product&&(identical(other.docId, docId) || other.docId == docId)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.price, price) || other.price == price)&&(identical(other.stock, stock) || other.stock == stock)&&(identical(other.isSale, isSale) || other.isSale == isSale)&&(identical(other.saleRate, saleRate) || other.saleRate == saleRate)&&(identical(other.imgUrl, imgUrl) || other.imgUrl == imgUrl)&&(identical(other.timeStamp, timeStamp) || other.timeStamp == timeStamp));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,docId,title,description,price,isSale,stock,saleRate,imgUrl,timeStamp);
+int get hashCode => Object.hash(runtimeType,docId,title,description,price,stock,isSale,saleRate,imgUrl,timeStamp);
 
 @override
 String toString() {
-  return 'Product(docId: $docId, title: $title, description: $description, price: $price, isSale: $isSale, stock: $stock, saleRate: $saleRate, imgUrl: $imgUrl, timeStamp: $timeStamp)';
+  return 'Product(docId: $docId, title: $title, description: $description, price: $price, stock: $stock, isSale: $isSale, saleRate: $saleRate, imgUrl: $imgUrl, timeStamp: $timeStamp)';
 }
 
 
@@ -134,7 +134,7 @@ abstract mixin class _$ProductCopyWith<$Res> implements $ProductCopyWith<$Res> {
   factory _$ProductCopyWith(_Product value, $Res Function(_Product) _then) = __$ProductCopyWithImpl;
 @override @useResult
 $Res call({
- String? docId, String? title, String? description, int? price, bool? isSale, int? stock, double? saleRate, String? imgUrl, int? timeStamp
+ String? docId, String? title, String? description, int? price, int? stock, bool? isSale, double? saleRate, String? imgUrl, int? timeStamp
 });
 
 
@@ -151,15 +151,15 @@ class __$ProductCopyWithImpl<$Res>
 
 /// Create a copy of Product
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? docId = freezed,Object? title = freezed,Object? description = freezed,Object? price = freezed,Object? isSale = freezed,Object? stock = freezed,Object? saleRate = freezed,Object? imgUrl = freezed,Object? timeStamp = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? docId = freezed,Object? title = freezed,Object? description = freezed,Object? price = freezed,Object? stock = freezed,Object? isSale = freezed,Object? saleRate = freezed,Object? imgUrl = freezed,Object? timeStamp = freezed,}) {
   return _then(_Product(
 docId: freezed == docId ? _self.docId : docId // ignore: cast_nullable_to_non_nullable
 as String?,title: freezed == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,price: freezed == price ? _self.price : price // ignore: cast_nullable_to_non_nullable
+as int?,stock: freezed == stock ? _self.stock : stock // ignore: cast_nullable_to_non_nullable
 as int?,isSale: freezed == isSale ? _self.isSale : isSale // ignore: cast_nullable_to_non_nullable
-as bool?,stock: freezed == stock ? _self.stock : stock // ignore: cast_nullable_to_non_nullable
-as int?,saleRate: freezed == saleRate ? _self.saleRate : saleRate // ignore: cast_nullable_to_non_nullable
+as bool?,saleRate: freezed == saleRate ? _self.saleRate : saleRate // ignore: cast_nullable_to_non_nullable
 as double?,imgUrl: freezed == imgUrl ? _self.imgUrl : imgUrl // ignore: cast_nullable_to_non_nullable
 as String?,timeStamp: freezed == timeStamp ? _self.timeStamp : timeStamp // ignore: cast_nullable_to_non_nullable
 as int?,
