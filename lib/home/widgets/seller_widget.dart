@@ -2,6 +2,7 @@ import 'package:big_root_market/model/product.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SellerWidget extends StatefulWidget {
   const SellerWidget({super.key});
@@ -13,9 +14,12 @@ class SellerWidget extends StatefulWidget {
 class _SellerWidgetState extends State<SellerWidget> {
   TextEditingController searchTextEditingController = TextEditingController();
   final _db = FirebaseFirestore.instance;
+  final _supabase = Supabase.instance.client;
 
   //검색 데이터 마지막 값을
-  final _searchSubject = BehaviorSubject<String>();
+  //final _searchSubject = BehaviorSubject<String>();
+  //초기값이 없으면 snapshot status waiting 에서 걸려서 계속 동글뱅이가 돈다. seeded를 사용하여 초기값으로 빈문자열을 넣어준다.
+  final _searchSubject = BehaviorSubject<String>.seeded('');
 
   Future<List<Product>> fetchProducts() async {
     final resp = await _db.collection('products').orderBy('timeStamp').get();
@@ -77,6 +81,19 @@ class _SellerWidgetState extends State<SellerWidget> {
     }
   }
 
+  /// update Example 용도 추후 디테일 화면에서 변경할 예정.
+  Future updateProduct(Product product) async {
+    try {
+      await _db.collection('products').doc(product.docId).update({
+        'title': 'milke',
+        'price': 123456,
+        'isSale': false,
+      });
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
   Future deleteProduct(Product product) async {
     try {
       // 선택 카테고리에 맞는 doc 가져온다.
@@ -88,8 +105,13 @@ class _SellerWidgetState extends State<SellerWidget> {
       await categoryRef.update({
         "products": FieldValue.arrayRemove([product.docId]),
       });
+
       //products 컬렉션 내부 product.docId와 동일한 document를 삭제.
       await _db.collection('products').doc(product.docId).delete();
+
+      await _supabase.storage.from('images').remove([
+        product.imgUrl!.split('/').last,
+      ]);
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -349,6 +371,7 @@ class _SellerWidgetState extends State<SellerWidget> {
                     return GestureDetector(
                       onTap: () {
                         debugPrint(item.docId);
+                        debugPrint(item.imgUrl);
                       },
                       child: Container(
                         margin: const EdgeInsets.only(bottom: 16),
@@ -392,6 +415,12 @@ class _SellerWidgetState extends State<SellerWidget> {
                                               (context) => [
                                                 const PopupMenuItem(
                                                   child: Text('리뷰'),
+                                                ),
+                                                PopupMenuItem(
+                                                  onTap: () async {
+                                                    updateProduct(item);
+                                                  },
+                                                  child: const Text('수정'),
                                                 ),
                                                 PopupMenuItem(
                                                   onTap: () async {
