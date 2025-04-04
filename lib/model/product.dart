@@ -30,7 +30,7 @@ sealed class Cart with _$Cart {
     String? email,
     int? timeStamp,
     int? count,
-    Product? product,
+    Map<String, dynamic>? product,
   }) = _Cart;
 
   factory Cart.fromJson(Map<String, dynamic> json) => _$CartFromJson(json);

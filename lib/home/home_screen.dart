@@ -2,7 +2,9 @@ import 'package:big_root_market/home/cart_screen.dart';
 import 'package:big_root_market/home/product_add_screen.dart';
 import 'package:big_root_market/home/widgets/home_widget.dart';
 import 'package:big_root_market/home/widgets/seller_widget.dart';
+import 'package:big_root_market/main.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -49,11 +51,13 @@ class _HomeScreenState extends State<HomeScreen> {
       switch (_menuindex) {
         0 => FloatingActionButton(
           onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => const CartScreen(uid: ''),
-              ),
-            );
+            // Navigator.of(context).push(
+            //   MaterialPageRoute(
+            //     builder: (context) => const CartScreen(uid: ''),
+            //   ),
+            //
+            // );
+            context.go('/cart/${userCredential.user!.uid}');
           },
           child: const Icon(Icons.shopping_cart_outlined),
         ),

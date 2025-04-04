@@ -38,10 +38,7 @@ _Cart _$CartFromJson(Map<String, dynamic> json) => _Cart(
   email: json['email'] as String?,
   timeStamp: (json['timeStamp'] as num?)?.toInt(),
   count: (json['count'] as num?)?.toInt(),
-  product:
-      json['product'] == null
-          ? null
-          : Product.fromJson(json['product'] as Map<String, dynamic>),
+  product: json['product'] as Map<String, dynamic>?,
 );
 
 Map<String, dynamic> _$CartToJson(_Cart instance) => <String, dynamic>{

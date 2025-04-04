@@ -1,4 +1,6 @@
+import 'package:big_root_market/main.dart';
 import 'package:big_root_market/model/product.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class ProductDetailScreen extends StatefulWidget {
@@ -10,6 +12,52 @@ class ProductDetailScreen extends StatefulWidget {
 }
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
+  final _db = FirebaseFirestore.instance;
+
+  Future addCart(Product selectProduct) async {
+    try {
+      final cart =
+          await _db
+              .collection('cart')
+              .where('uid', isEqualTo: userCredential.user?.uid ?? '')
+              .where('product.docId', isEqualTo: selectProduct.docId)
+              .get();
+
+      if (!mounted) return;
+      //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('test')));
+
+      if (cart.docs.isNotEmpty) {
+        showDialog(
+          context: context,
+          builder:
+              (context) =>
+                  const AlertDialog(content: Text('이미 장바구니에 등록되어 있는 상품 입니다.')),
+        );
+        return;
+      }
+      await _db
+          .collection('cart')
+          .add(
+            Cart(
+              uid: userCredential.user!.uid,
+              email: userCredential.user!.email,
+              timeStamp: DateTime.now().millisecondsSinceEpoch,
+              count: 1,
+              product: selectProduct.toJson(),
+            ).toJson(),
+          );
+
+      if (!mounted) return;
+      showDialog(
+        context: context,
+        builder:
+            (context) => const AlertDialog(content: Text('장바구니에 등록되었습니다.')),
+      );
+    } catch (e) {
+      debugPrint('ERROR addCart : ${e.toString()}');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final product = widget.product;
@@ -198,7 +246,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               ),
             ),
             GestureDetector(
-              onTap: () {},
+              onTap: () {
+                addCart(widget.product);
+              },
               child: Container(
                 height: 72,
                 color: Colors.red[100],

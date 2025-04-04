@@ -1,3 +1,5 @@
+import 'package:big_root_market/model/product.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class CartScreen extends StatefulWidget {
@@ -9,74 +11,129 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
+  final _db = FirebaseFirestore.instance;
+  Stream<QuerySnapshot<Map<String, dynamic>>>? streamCart() {
+    try {
+      return _db
+          .collection('cart')
+          .where('uid', isEqualTo: widget.uid)
+          .snapshots();
+    } catch (e) {
+      debugPrint('ERROR streamCart : ${e.toString()}');
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    print(widget.uid);
     return Scaffold(
       appBar: AppBar(title: const Text('장바구니')),
       body: SafeArea(
         child: Column(
           children: [
             Expanded(
-              child: ListView.separated(
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 120,
-                          height: 120,
-                          decoration: BoxDecoration(
-                            color: Colors.blue,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    const Text('Dummy Text'),
-                                    IconButton(
-                                      onPressed: () {},
-                                      icon: const Icon(Icons.delete),
-                                    ),
-                                  ],
+              child: StreamBuilder(
+                stream: streamCart(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const CircularProgressIndicator();
+                  }
+
+                  if (snapshot.hasError) {
+                    return const Text('오류 발생 문의 02-0000-0000');
+                  }
+
+                  if (snapshot.data == null) {
+                    return const Text('장바구니가 비어있습니다.');
+                  }
+
+                  final docs = snapshot.data!.docs;
+
+                  final List<Cart> cartList =
+                      docs.map((e) {
+                        return Cart.fromJson(e.data());
+                      }).toList();
+
+                  return ListView.separated(
+                    itemCount: cartList.length,
+                    itemBuilder: (context, index) {
+                      final product = Product.fromJson(
+                        cartList[index].product!,
+                      );
+                      final cart = cartList[index];
+                      final isSaleCal = (((product.saleRate ?? 0) / 100)
+                          .toStringAsFixed(2));
+
+                      final resultPrice =
+                          (product.price! -
+                                  (((product.price ?? 0) *
+                                          (double.tryParse(isSaleCal) ?? 0.0)) *
+                                      cart.count!))
+                              .toInt();
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 120,
+                              height: 120,
+                              decoration: BoxDecoration(
+                                color: Colors.blue,
+                                borderRadius: BorderRadius.circular(10),
+                                image: DecorationImage(
+                                  image: NetworkImage(product.imgUrl!),
+                                  fit: BoxFit.cover,
                                 ),
-                                const Text('100000원'),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    IconButton(
-                                      onPressed: () {},
-                                      icon: const Icon(
-                                        Icons.remove_circle_outline,
-                                      ),
-                                    ),
-                                    const Text('5'),
-                                    IconButton(
-                                      onPressed: () {},
-                                      icon: const Icon(
-                                        Icons.add_circle_outline,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                              ),
                             ),
-                          ),
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 16),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(product.title ?? 'Dummy Text'),
+                                        IconButton(
+                                          onPressed: () {},
+                                          icon: const Icon(Icons.delete),
+                                        ),
+                                      ],
+                                    ),
+                                    Text('${resultPrice ?? 0} 원'),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        IconButton(
+                                          onPressed: () {},
+                                          icon: const Icon(
+                                            Icons.remove_circle_outline,
+                                          ),
+                                        ),
+                                        Text('${cart.count ?? 1}'),
+                                        IconButton(
+                                          onPressed: () {},
+                                          icon: const Icon(
+                                            Icons.add_circle_outline,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      );
+                    },
+                    separatorBuilder: (context, _) => const Divider(),
                   );
                 },
-                separatorBuilder: (context, _) => const Divider(),
-                itemCount: 10,
               ),
             ),
             const Divider(),

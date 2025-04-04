@@ -176,7 +176,7 @@ as String?,
 /// @nodoc
 mixin _$Cart {
 
- String? get cartDocId; String? get uid; String? get email; int? get timeStamp; int? get count; Product? get product;
+ String? get cartDocId; String? get uid; String? get email; int? get timeStamp; int? get count; Map<String, dynamic>? get product;
 /// Create a copy of Cart
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -189,12 +189,12 @@ $CartCopyWith<Cart> get copyWith => _$CartCopyWithImpl<Cart>(this as Cart, _$ide
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Cart&&(identical(other.cartDocId, cartDocId) || other.cartDocId == cartDocId)&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.email, email) || other.email == email)&&(identical(other.timeStamp, timeStamp) || other.timeStamp == timeStamp)&&(identical(other.count, count) || other.count == count)&&(identical(other.product, product) || other.product == product));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Cart&&(identical(other.cartDocId, cartDocId) || other.cartDocId == cartDocId)&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.email, email) || other.email == email)&&(identical(other.timeStamp, timeStamp) || other.timeStamp == timeStamp)&&(identical(other.count, count) || other.count == count)&&const DeepCollectionEquality().equals(other.product, product));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,cartDocId,uid,email,timeStamp,count,product);
+int get hashCode => Object.hash(runtimeType,cartDocId,uid,email,timeStamp,count,const DeepCollectionEquality().hash(product));
 
 @override
 String toString() {
@@ -209,11 +209,11 @@ abstract mixin class $CartCopyWith<$Res>  {
   factory $CartCopyWith(Cart value, $Res Function(Cart) _then) = _$CartCopyWithImpl;
 @useResult
 $Res call({
- String? cartDocId, String? uid, String? email, int? timeStamp, int? count, Product? product
+ String? cartDocId, String? uid, String? email, int? timeStamp, int? count, Map<String, dynamic>? product
 });
 
 
-$ProductCopyWith<$Res>? get product;
+
 
 }
 /// @nodoc
@@ -234,22 +234,10 @@ as String?,email: freezed == email ? _self.email : email // ignore: cast_nullabl
 as String?,timeStamp: freezed == timeStamp ? _self.timeStamp : timeStamp // ignore: cast_nullable_to_non_nullable
 as int?,count: freezed == count ? _self.count : count // ignore: cast_nullable_to_non_nullable
 as int?,product: freezed == product ? _self.product : product // ignore: cast_nullable_to_non_nullable
-as Product?,
+as Map<String, dynamic>?,
   ));
 }
-/// Create a copy of Cart
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$ProductCopyWith<$Res>? get product {
-    if (_self.product == null) {
-    return null;
-  }
 
-  return $ProductCopyWith<$Res>(_self.product!, (value) {
-    return _then(_self.copyWith(product: value));
-  });
-}
 }
 
 
@@ -257,7 +245,7 @@ $ProductCopyWith<$Res>? get product {
 @JsonSerializable()
 
 class _Cart implements Cart {
-   _Cart({this.cartDocId, this.uid, this.email, this.timeStamp, this.count, this.product});
+   _Cart({this.cartDocId, this.uid, this.email, this.timeStamp, this.count, final  Map<String, dynamic>? product}): _product = product;
   factory _Cart.fromJson(Map<String, dynamic> json) => _$CartFromJson(json);
 
 @override final  String? cartDocId;
@@ -265,7 +253,15 @@ class _Cart implements Cart {
 @override final  String? email;
 @override final  int? timeStamp;
 @override final  int? count;
-@override final  Product? product;
+ final  Map<String, dynamic>? _product;
+@override Map<String, dynamic>? get product {
+  final value = _product;
+  if (value == null) return null;
+  if (_product is EqualUnmodifiableMapView) return _product;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableMapView(value);
+}
+
 
 /// Create a copy of Cart
 /// with the given fields replaced by the non-null parameter values.
@@ -280,12 +276,12 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Cart&&(identical(other.cartDocId, cartDocId) || other.cartDocId == cartDocId)&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.email, email) || other.email == email)&&(identical(other.timeStamp, timeStamp) || other.timeStamp == timeStamp)&&(identical(other.count, count) || other.count == count)&&(identical(other.product, product) || other.product == product));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Cart&&(identical(other.cartDocId, cartDocId) || other.cartDocId == cartDocId)&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.email, email) || other.email == email)&&(identical(other.timeStamp, timeStamp) || other.timeStamp == timeStamp)&&(identical(other.count, count) || other.count == count)&&const DeepCollectionEquality().equals(other._product, _product));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,cartDocId,uid,email,timeStamp,count,product);
+int get hashCode => Object.hash(runtimeType,cartDocId,uid,email,timeStamp,count,const DeepCollectionEquality().hash(_product));
 
 @override
 String toString() {
@@ -300,11 +296,11 @@ abstract mixin class _$CartCopyWith<$Res> implements $CartCopyWith<$Res> {
   factory _$CartCopyWith(_Cart value, $Res Function(_Cart) _then) = __$CartCopyWithImpl;
 @override @useResult
 $Res call({
- String? cartDocId, String? uid, String? email, int? timeStamp, int? count, Product? product
+ String? cartDocId, String? uid, String? email, int? timeStamp, int? count, Map<String, dynamic>? product
 });
 
 
-@override $ProductCopyWith<$Res>? get product;
+
 
 }
 /// @nodoc
@@ -324,24 +320,12 @@ as String?,uid: freezed == uid ? _self.uid : uid // ignore: cast_nullable_to_non
 as String?,email: freezed == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String?,timeStamp: freezed == timeStamp ? _self.timeStamp : timeStamp // ignore: cast_nullable_to_non_nullable
 as int?,count: freezed == count ? _self.count : count // ignore: cast_nullable_to_non_nullable
-as int?,product: freezed == product ? _self.product : product // ignore: cast_nullable_to_non_nullable
-as Product?,
+as int?,product: freezed == product ? _self._product : product // ignore: cast_nullable_to_non_nullable
+as Map<String, dynamic>?,
   ));
 }
 
-/// Create a copy of Cart
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$ProductCopyWith<$Res>? get product {
-    if (_self.product == null) {
-    return null;
-  }
 
-  return $ProductCopyWith<$Res>(_self.product!, (value) {
-    return _then(_self.copyWith(product: value));
-  });
-}
 }
 
 // dart format on
