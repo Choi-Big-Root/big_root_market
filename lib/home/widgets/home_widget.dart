@@ -1,9 +1,9 @@
-import 'package:big_root_market/home/product_detail_screen.dart';
 import 'package:big_root_market/model/category.dart';
 import 'package:big_root_market/model/product.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:dots_indicator/dots_indicator.dart';
+import 'package:go_router/go_router.dart';
 
 class HomeWidget extends StatefulWidget {
   const HomeWidget({super.key});
@@ -122,7 +122,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                           Category(title: doc.get('title'), docId: doc.id),
                         );
                       }
-                      debugPrint(categories.toString());
+                      //debugPrint(categories.toString());
 
                       return GridView.builder(
                         physics:
@@ -228,12 +228,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                   .toInt();
                           return GestureDetector(
                             onTap: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder:
-                                      (context) => const ProductDetailScreen(),
-                                ),
-                              );
+                              context.go('/product', extra: item);
                             },
                             child: Container(
                               width: 160,

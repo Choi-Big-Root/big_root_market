@@ -1,7 +1,9 @@
+import 'package:big_root_market/model/product.dart';
 import 'package:flutter/material.dart';
 
 class ProductDetailScreen extends StatefulWidget {
-  const ProductDetailScreen({super.key});
+  final Product product;
+  const ProductDetailScreen({super.key, required this.product});
 
   @override
   State<ProductDetailScreen> createState() => _ProductDetailScreenState();
@@ -10,8 +12,9 @@ class ProductDetailScreen extends StatefulWidget {
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
   @override
   Widget build(BuildContext context) {
+    final product = widget.product;
     return Scaffold(
-      appBar: AppBar(title: const Text('BigRoot 제품 상세')),
+      appBar: AppBar(title: Text(product.title ?? 'BigRoot 제품 상세')),
       body: SafeArea(
         child: Column(
           children: [
@@ -23,28 +26,37 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     Container(
                       height: 320,
                       padding: const EdgeInsets.all(16),
-                      decoration: const BoxDecoration(color: Colors.orange),
+                      decoration: BoxDecoration(
+                        color: Colors.orange,
+                        image: DecorationImage(
+                          image: NetworkImage(product.imgUrl!),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                       child: Center(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              decoration: const BoxDecoration(
-                                color: Colors.red,
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 12,
-                                horizontal: 24,
-                              ),
-                              child: const Text(
-                                '할인중',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.white,
+                            switch (product.isSale) {
+                              true => Container(
+                                decoration: const BoxDecoration(
+                                  color: Colors.red,
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                  horizontal: 24,
+                                ),
+                                child: const Text(
+                                  '할인중',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
-                            ),
+                              _ => Container(),
+                            },
                           ],
                         ),
                       ),
@@ -58,9 +70,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text(
-                                'BigRoot 플러터',
-                                style: TextStyle(
+                              Text(
+                                product.title ?? 'BigRoot 플러터',
+                                style: const TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -145,23 +157,23 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             ],
                           ),
                           const Text('제품 상세 정보'),
-                          const Text('상세상세'),
-                          const Row(
+                          Text(product.description ?? '상세'),
+                          Row(
                             children: [
                               Text(
-                                '100000원',
-                                style: TextStyle(
+                                '${product.price ?? 100000} 원',
+                                style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
                                 ),
                               ),
-                              Spacer(),
-                              Icon(
+                              const Spacer(),
+                              const Icon(
                                 //Icons.star_border_outlined,
                                 Icons.star,
                                 color: Colors.orange,
                               ),
-                              Text('4.5'),
+                              const Text('4.5'),
                             ],
                           ),
                         ],
