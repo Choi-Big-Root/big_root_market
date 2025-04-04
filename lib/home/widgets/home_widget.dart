@@ -1,4 +1,6 @@
 import 'package:big_root_market/home/product_detail_screen.dart';
+import 'package:big_root_market/model/category.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 
@@ -12,6 +14,18 @@ class HomeWidget extends StatefulWidget {
 class _HomeWidgetState extends State<HomeWidget> {
   final PageController _pageController = PageController();
   int _bannerIndex = 0;
+  final _db = FirebaseFirestore.instance;
+
+  List<Category> categories = [];
+
+  Stream<QuerySnapshot<Map<String, dynamic>>>? streamCategories() {
+    try {
+      return _db.collection('categories').snapshots();
+    } catch (e) {
+      debugPrint('ERROR streamCategory : ${e.toString()}');
+      return null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +81,72 @@ class _HomeWidgetState extends State<HomeWidget> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                Container(color: Colors.red, height: 180),
+                Container(
+                  height: 180,
+                  child: StreamBuilder(
+                    stream: streamCategories(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
+                      }
+
+                      if (snapshot.hasError) {
+                        return const Text('오류가 발생했습니다. 문의 02-0000-0000');
+                      }
+
+                      if (snapshot.data == null) {
+                        return const Text('카테고리가 존재하지 않습니다.');
+                      }
+
+                      final docs = snapshot.data;
+                      categories.clear();
+                      for (var doc in docs!.docs) {
+                        categories.add(
+                          Category(title: doc.get('title'), docId: doc.id),
+                        );
+                      }
+                      debugPrint(categories.toString());
+
+                      return GridView.builder(
+                        physics:
+                            categories.length > 8
+                                ? const AlwaysScrollableScrollPhysics()
+                                : const NeverScrollableScrollPhysics(),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 4,
+                            ),
+                        itemCount: categories.length,
+                        itemBuilder: (context, index) {
+                          return Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SizedBox(
+                                height: 50,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(25),
+                                  child: Image.network(
+                                    'https://picsum.photos/id/${400 + index}/200/200',
+                                  ),
+                                ),
+                              ),
+
+                              Padding(
+                                padding: const EdgeInsets.only(top: 5),
+                                child: Text(
+                                  categories[index].title ?? '',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
               ],
             ),
           ),
