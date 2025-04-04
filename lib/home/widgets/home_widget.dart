@@ -1,5 +1,6 @@
 import 'package:big_root_market/home/product_detail_screen.dart';
 import 'package:big_root_market/model/category.dart';
+import 'package:big_root_market/model/product.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:dots_indicator/dots_indicator.dart';
@@ -17,12 +18,28 @@ class _HomeWidgetState extends State<HomeWidget> {
   final _db = FirebaseFirestore.instance;
 
   List<Category> categories = [];
+  List<Product> salesProducts = [];
 
+  /// 카테고리 목록 가져오기
   Stream<QuerySnapshot<Map<String, dynamic>>>? streamCategories() {
     try {
       return _db.collection('categories').snapshots();
     } catch (e) {
       debugPrint('ERROR streamCategory : ${e.toString()}');
+      return null;
+    }
+  }
+
+  /// 할인 중인 상품 가져오기
+  Stream<QuerySnapshot<Map<String, dynamic>>>? streamSalesProducts() {
+    try {
+      return _db
+          .collection('products')
+          .where('isSale', isEqualTo: true)
+          .orderBy('saleRate', descending: true)
+          .snapshots();
+    } catch (e) {
+      debugPrint('ERROR streamSalesProducts : ${e.toString()}');
       return null;
     }
   }
@@ -81,7 +98,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                Container(
+                SizedBox(
                   height: 180,
                   child: StreamBuilder(
                     stream: streamCategories(),
@@ -170,26 +187,127 @@ class _HomeWidgetState extends State<HomeWidget> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                Container(
+                SizedBox(
                   height: 240,
-                  color: Colors.orange,
-                  child: ListView.builder(
-                    itemCount: 10,
-                    scrollDirection: Axis.horizontal, //이게 빠지면 문제가 발생.
-                    itemBuilder: (context, index) {
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const ProductDetailScreen(),
+                  //color: Colors.orange,
+                  child: StreamBuilder(
+                    stream: streamSalesProducts(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
+                      }
+
+                      if (snapshot.hasError) {
+                        return const Text('오류 발생 문의 02-0000-0000');
+                      }
+
+                      if (snapshot.data == null) {
+                        return const Text('상품이 없습니다.');
+                      }
+
+                      final productDocs = snapshot.data!.docs;
+                      salesProducts =
+                          productDocs.map((doc) {
+                            return Product.fromJson(
+                              doc.data(),
+                            ).copyWith(docId: doc.id);
+                          }).toList();
+
+                      return ListView.builder(
+                        itemCount: salesProducts.length,
+                        scrollDirection: Axis.horizontal, //이게 빠지면 문제가 발생.
+                        itemBuilder: (context, index) {
+                          final item = salesProducts[index];
+                          final isSaleCal = (((item.saleRate ?? 0) / 100)
+                              .toStringAsFixed(2));
+
+                          final resultPrice =
+                              item.price! -
+                              ((item.price ?? 0) *
+                                      (double.tryParse(isSaleCal) ?? 0.0))
+                                  .toInt();
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) => const ProductDetailScreen(),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              width: 160,
+                              margin: const EdgeInsets.only(right: 16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(20),
+                                      child: Image.network(
+                                        item.imgUrl ?? '',
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    item.title ?? '',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                  Row(
+                                    children: [
+                                      Text(
+                                        '${item.price} 원',
+                                        style: const TextStyle(
+                                          decoration:
+                                              TextDecoration.lineThrough,
+                                        ),
+                                      ),
+                                      Container(
+                                        margin: const EdgeInsets.only(left: 5),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 5,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: const Color.fromRGBO(
+                                            235,
+                                            221,
+                                            255,
+                                            1,
+                                          ),
+                                          border: Border.all(
+                                            width: 1,
+                                            color: const Color.fromRGBO(
+                                              235,
+                                              221,
+                                              255,
+                                              1,
+                                            ),
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            4,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          '-${item.saleRate!.toStringAsFixed(1)}%',
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Text(
+                                    '$resultPrice 원',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           );
                         },
-                        child: Container(
-                          width: 160,
-                          margin: const EdgeInsets.only(right: 16),
-                          decoration: const BoxDecoration(color: Colors.grey),
-                        ),
                       );
                     },
                   ),

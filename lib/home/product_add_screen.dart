@@ -145,8 +145,7 @@ class _ProductAddScreenState extends State<ProductAddScreen> {
           _title = '$_title$i';
           _price = Random().nextInt(99000) + 1000;
           _isSale = true;
-          double randomValue = Random().nextDouble() * (0.9 - 0.1) + 0.1;
-          _saleRate = randomValue * 10;
+          _saleRate = Random().nextDouble() * (90 - 10) + 10;
           _stock = Random().nextInt(30) + 1;
 
           _product = Product(
