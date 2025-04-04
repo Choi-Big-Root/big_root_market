@@ -5,6 +5,7 @@ import 'package:big_root_market/home/product_add_screen.dart';
 import 'package:big_root_market/home/product_detail_screen.dart';
 import 'package:big_root_market/login/login_screen.dart';
 import 'package:big_root_market/login/sign_up_screen.dart';
+import 'package:big_root_market/model/product.dart';
 import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -62,7 +63,9 @@ class BigRootMarketApp extends StatelessWidget {
           ),
           GoRoute(
             path: 'product',
-            builder: (context, state) => const ProductDetailScreen(),
+            builder:
+                (context, state) =>
+                    ProductDetailScreen(product: state.extra as Product),
           ),
           GoRoute(
             path: 'product/add',
