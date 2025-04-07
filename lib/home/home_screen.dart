@@ -1,8 +1,10 @@
 import 'package:big_root_market/home/product_add_screen.dart';
 import 'package:big_root_market/home/widgets/home_widget.dart';
 import 'package:big_root_market/home/widgets/seller_widget.dart';
+import 'package:big_root_market/login/provider/login_provider.dart';
 import 'package:big_root_market/main.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -48,17 +50,22 @@ class _HomeScreenState extends State<HomeScreen> {
       //     )
       //     : Container(),
       switch (_menuindex) {
-        0 => FloatingActionButton(
-          onPressed: () {
-            // Navigator.of(context).push(
-            //   MaterialPageRoute(
-            //     builder: (context) => const CartScreen(uid: ''),
-            //   ),
-            //
-            // );
-            context.go('/cart/${userCredential.user!.uid}');
+        0 => Consumer(
+          builder: (BuildContext context, WidgetRef ref, Widget? child) {
+            final user = ref.watch(userProvider);
+            return FloatingActionButton(
+              onPressed: () {
+                // Navigator.of(context).push(
+                //   MaterialPageRoute(
+                //     builder: (context) => const CartScreen(uid: ''),
+                //   ),
+                //
+                // );
+                context.go('/cart/${user!.user!.uid}');
+              },
+              child: const Icon(Icons.shopping_cart_outlined),
+            );
           },
-          child: const Icon(Icons.shopping_cart_outlined),
         ),
         1 => FloatingActionButton(
           onPressed: () {

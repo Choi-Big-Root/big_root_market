@@ -1,25 +1,35 @@
+import 'package:big_root_market/login/provider/login_provider.dart';
 import 'package:big_root_market/main.dart';
 import 'package:big_root_market/model/product.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ProductDetailScreen extends StatefulWidget {
+class ProductDetailScreen extends ConsumerStatefulWidget {
   final Product product;
   const ProductDetailScreen({super.key, required this.product});
 
   @override
-  State<ProductDetailScreen> createState() => _ProductDetailScreenState();
+  ConsumerState<ProductDetailScreen> createState() =>
+      _ProductDetailScreenState();
 }
 
-class _ProductDetailScreenState extends State<ProductDetailScreen> {
+class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   final _db = FirebaseFirestore.instance;
+  late final UserCredential? _user;
+  @override
+  void initState() {
+    super.initState();
+    _user = ref.read(userProvider);
+  }
 
   Future addCart(Product selectProduct) async {
     try {
       final cart =
           await _db
               .collection('cart')
-              .where('uid', isEqualTo: userCredential.user?.uid ?? '')
+              .where('uid', isEqualTo: _user?.user?.uid ?? '')
               .where('product.docId', isEqualTo: selectProduct.docId)
               .get();
 
@@ -39,8 +49,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           .collection('cart')
           .add(
             Cart(
-              uid: userCredential.user!.uid,
-              email: userCredential.user!.email,
+              uid: _user?.user!.uid,
+              email: _user?.user!.email,
               timeStamp: DateTime.now().millisecondsSinceEpoch,
               count: 1,
               product: selectProduct.toJson(),

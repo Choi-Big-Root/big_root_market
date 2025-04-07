@@ -1,7 +1,11 @@
+import 'package:big_root_market/login/provider/login_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+
+import '../main.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -104,34 +108,39 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            MaterialButton(
-              onPressed: () async {
-                if (_formKey.currentState!.validate()) {
-                  _formKey.currentState!.save(); // 각 필드 별 onSaved() 호출.
+            Consumer(
+              builder: (BuildContext context, WidgetRef ref, Widget? child) {
+                return MaterialButton(
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      _formKey.currentState!.save(); // 각 필드 별 onSaved() 호출.
 
-                  final result = await signIn(_email, _password);
+                      final result = await signIn(_email, _password);
 
-                  if (!context.mounted) return;
-                  //실패시 동작
-                  if (result == null) {
-                    ScaffoldMessenger.of(
-                      context,
-                    ).showSnackBar(const SnackBar(content: Text('로그인 실패')));
-                    return;
-                  }
+                      if (!context.mounted) return;
+                      //실패시 동작
+                      if (result == null) {
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(const SnackBar(content: Text('로그인 실패')));
+                        return;
+                      }
+                      ref.watch(userProvider.notifier).state = result;
+                      //성공시 동작
+                      debugPrint('BIGROOT : 로그인 성공');
+                      context.go('/');
+                    }
+                  },
 
-                  //성공시 동작
-                  debugPrint('BIGROOT : 로그인 성공');
-                  context.go('/');
-                }
+                  color: Colors.red,
+                  minWidth: double.infinity,
+                  height: 48,
+                  child: const Text(
+                    '로그인',
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                  ),
+                );
               },
-              color: Colors.red,
-              minWidth: double.infinity,
-              height: 48,
-              child: const Text(
-                '로그인',
-                style: TextStyle(color: Colors.white, fontSize: 18),
-              ),
             ),
             TextButton(
               /*
