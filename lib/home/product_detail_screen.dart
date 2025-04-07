@@ -1,5 +1,4 @@
 import 'package:big_root_market/login/provider/login_provider.dart';
-import 'package:big_root_market/main.dart';
 import 'package:big_root_market/model/product.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -22,6 +21,36 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   void initState() {
     super.initState();
     _user = ref.read(userProvider);
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> streamReviews() {
+    return _db
+        .collection("products")
+        .doc(widget.product.docId)
+        .collection('reviews')
+        .snapshots();
+  }
+
+  Future addReview(
+    Product selectProduct,
+    TextEditingController reviewTEC,
+    int reviewScore,
+  ) async {
+    try {
+      await _db
+          .collection('products')
+          .doc(selectProduct.docId)
+          .collection('reviews')
+          .add({
+            "uid": _user!.user!.uid,
+            "email": _user.user!.email,
+            "review": reviewTEC.text,
+            "timeStamp": DateTime.now().millisecondsSinceEpoch,
+            "score": reviewScore + 1,
+          });
+    } catch (e) {
+      debugPrint('ERROR addReview() : ${e.toString()}');
+    }
   }
 
   Future addCart(Product selectProduct) async {
@@ -81,43 +110,51 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      height: 320,
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.orange,
-                        image: DecorationImage(
-                          image: NetworkImage(product.imgUrl!),
-                          fit: BoxFit.cover,
+                    Stack(
+                      children: [
+                        Container(
+                          height: 320,
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.orange,
+                            image: DecorationImage(
+                              image: NetworkImage(product.imgUrl!),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
                         ),
-                      ),
-                      child: Center(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            switch (product.isSale) {
-                              true => Container(
-                                decoration: const BoxDecoration(
-                                  color: Colors.red,
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 12,
-                                  horizontal: 24,
-                                ),
-                                child: const Text(
-                                  '할인중',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    color: Colors.white,
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 12,
+                            horizontal: 8,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              switch (product.isSale) {
+                                true => Container(
+                                  decoration: const BoxDecoration(
+                                    color: Colors.red,
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                    horizontal: 24,
+                                  ),
+                                  child: const Text(
+                                    '할인중',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                      color: Colors.white,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              _ => Container(),
-                            },
-                          ],
+                                _ => Container(),
+                              },
+                            ],
+                          ),
                         ),
-                      ),
+                      ],
                     ),
 
                     Padding(
@@ -146,6 +183,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                                         reviewTextEditingController =
                                             TextEditingController();
                                         showDialog(
+                                          barrierDismissible: false,
                                           context: context,
                                           builder: (context) {
                                             return StatefulBuilder(
@@ -197,8 +235,21 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                                                       },
                                                       child: const Text('취소'),
                                                     ),
+
                                                     TextButton(
-                                                      onPressed: () {},
+                                                      onPressed: () {
+                                                        addReview(
+                                                          product,
+                                                          reviewTextEditingController,
+                                                          reviewScore,
+                                                        );
+                                                        if (!context.mounted) {
+                                                          return;
+                                                        }
+                                                        Navigator.of(
+                                                          context,
+                                                        ).pop();
+                                                      },
                                                       child: const Text('확인'),
                                                     ),
                                                   ],
@@ -237,15 +288,62 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                         ],
                       ),
                     ),
-                    const DefaultTabController(
+                    DefaultTabController(
                       length: 2,
                       child: Column(
                         children: [
-                          TabBar(tabs: [Tab(text: '제품 상세'), Tab(text: '리뷰')]),
+                          const TabBar(
+                            tabs: [Tab(text: '제품 상세'), Tab(text: '리뷰')],
+                          ),
                           SizedBox(
                             height: 500,
                             child: TabBarView(
-                              children: [Text('제품 상세'), Text('리뷰')],
+                              children: [
+                                const Text('제품 상세'),
+                                StreamBuilder(
+                                  stream: streamReviews(),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData) {
+                                      List items =
+                                          snapshot.data!.docs.map((e) {
+                                            return e.data();
+                                          }).toList();
+
+                                      return ListView.separated(
+                                        itemCount: items.length,
+                                        itemBuilder: (context, index) {
+                                          return ListTile(
+                                            leading: const Icon(
+                                              Icons.people_alt,
+                                              size: 30,
+                                            ),
+                                            title: Text(items[index]['review']),
+                                            subtitle: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Text(items[index]['email']),
+                                                Text(
+                                                  '${items[index]['timeStamp']}',
+                                                ),
+                                              ],
+                                            ),
+                                            isThreeLine: false,
+                                          );
+                                        },
+                                        separatorBuilder:
+                                            (BuildContext _, int __) =>
+                                                const Divider(),
+                                      );
+                                    } else {
+                                      return const Center(
+                                        child: CircularProgressIndicator(),
+                                      );
+                                    }
+                                  },
+                                ),
+                              ],
                             ),
                           ),
                         ],
