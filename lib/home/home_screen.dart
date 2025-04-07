@@ -1,4 +1,3 @@
-import 'package:big_root_market/home/cart_screen.dart';
 import 'package:big_root_market/home/product_add_screen.dart';
 import 'package:big_root_market/home/widgets/home_widget.dart';
 import 'package:big_root_market/home/widgets/seller_widget.dart';

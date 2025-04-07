@@ -17,6 +17,7 @@ class _CartScreenState extends State<CartScreen> {
       return _db
           .collection('cart')
           .where('uid', isEqualTo: widget.uid)
+          .orderBy("timeStamp")
           .snapshots();
     } catch (e) {
       debugPrint('ERROR streamCart : ${e.toString()}');
@@ -26,7 +27,6 @@ class _CartScreenState extends State<CartScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print(widget.uid);
     return Scaffold(
       appBar: AppBar(title: const Text('장바구니')),
       body: SafeArea(
@@ -52,9 +52,10 @@ class _CartScreenState extends State<CartScreen> {
 
                   final List<Cart> cartList =
                       docs.map((e) {
-                        return Cart.fromJson(e.data());
+                        return Cart.fromJson({...e.data(), "cartDocId": e.id});
                       }).toList();
 
+                  //print(cartList);
                   return ListView.separated(
                     itemCount: cartList.length,
                     itemBuilder: (context, index) {
@@ -62,15 +63,16 @@ class _CartScreenState extends State<CartScreen> {
                         cartList[index].product!,
                       );
                       final cart = cartList[index];
-                      final isSaleCal = (((product.saleRate ?? 0) / 100)
-                          .toStringAsFixed(2));
-
                       final resultPrice =
-                          (product.price! -
-                                  (((product.price ?? 0) *
-                                          (double.tryParse(isSaleCal) ?? 0.0)) *
-                                      cart.count!))
-                              .toInt();
+                          (product.isSale ?? false)
+                              ? ((product.price ?? 0) -
+                                          product.saleRate! /
+                                              100 *
+                                              product.price!)
+                                      .toInt() *
+                                  cart.count!
+                              : (product.price ?? 0).toInt() * cart.count!;
+
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         child: Row(
@@ -104,19 +106,38 @@ class _CartScreenState extends State<CartScreen> {
                                         ),
                                       ],
                                     ),
-                                    Text('${resultPrice ?? 0} 원'),
+                                    Text('$resultPrice 원'),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.end,
                                       children: [
                                         IconButton(
-                                          onPressed: () {},
+                                          onPressed: () async {
+                                            if (cart.count! <= 1 ||
+                                                cart.count == null) {
+                                              return;
+                                            }
+
+                                            await _db
+                                                .collection('cart')
+                                                .doc("${cart.cartDocId}")
+                                                .update({
+                                                  "count": cart.count! - 1,
+                                                });
+                                          },
                                           icon: const Icon(
                                             Icons.remove_circle_outline,
                                           ),
                                         ),
                                         Text('${cart.count ?? 1}'),
                                         IconButton(
-                                          onPressed: () {},
+                                          onPressed: () async {
+                                            await _db
+                                                .collection('cart')
+                                                .doc("${cart.cartDocId}")
+                                                .update({
+                                                  "count": cart.count! + 1,
+                                                });
+                                          },
                                           icon: const Icon(
                                             Icons.add_circle_outline,
                                           ),
