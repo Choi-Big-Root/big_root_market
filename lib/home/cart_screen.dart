@@ -160,24 +160,60 @@ class _CartScreenState extends State<CartScreen> {
             const Divider(),
             Column(
               children: [
-                const Padding(
-                  padding: EdgeInsets.all(16.0),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
+                      const Text(
                         '합계',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Text(
-                        '1000000원',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      StreamBuilder(
+                        stream: streamCart(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasError) {
+                            return const Text('오류 발생 문의하세요. 02-0000-0000');
+                          }
+                          if (!snapshot.hasData) {
+                            return const Text('장바구니가 비어 있습니다.');
+                          }
+
+                          final List<Cart> cartItems =
+                              snapshot.data!.docs.map((e) {
+                                final foo = Cart.fromJson(e.data());
+                                return foo.copyWith(cartDocId: e.id);
+                              }).toList();
+                          var totalPrice = 0;
+                          for (var item in cartItems) {
+                            final product = Product.fromJson(item.product!);
+
+                            if (product.isSale ?? false) {
+                              totalPrice +=
+                                  ((product.price ?? 0) -
+                                          (product.saleRate! /
+                                              100 *
+                                              (product.price ?? 0)))
+                                      .toInt() *
+                                  (item.count ?? 1);
+                            } else {
+                              totalPrice +=
+                                  (product.price ?? 0).toInt() *
+                                  (item.count ?? 1);
+                            }
+                          }
+
+                          return Text(
+                            '$totalPrice원',
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
