@@ -2,7 +2,6 @@ import 'package:big_root_market/home/product_add_screen.dart';
 import 'package:big_root_market/home/widgets/home_widget.dart';
 import 'package:big_root_market/home/widgets/seller_widget.dart';
 import 'package:big_root_market/login/provider/login_provider.dart';
-import 'package:big_root_market/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
