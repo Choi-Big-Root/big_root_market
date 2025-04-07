@@ -101,7 +101,36 @@ class _CartScreenState extends State<CartScreen> {
                                       children: [
                                         Text(product.title ?? 'Dummy Text'),
                                         IconButton(
-                                          onPressed: () {},
+                                          onPressed: () {
+                                            final doc = _db
+                                                .collection('cart')
+                                                .doc(cart.cartDocId);
+                                            doc
+                                                .delete()
+                                                .then((_) {
+                                                  if (!context.mounted) return;
+                                                  ScaffoldMessenger.of(
+                                                    context,
+                                                  ).showSnackBar(
+                                                    const SnackBar(
+                                                      content: Text(
+                                                        '정상적으로 제거 되었습니다.',
+                                                      ),
+                                                    ),
+                                                  );
+                                                })
+                                                .catchError((e) {
+                                                  if (!context.mounted) return;
+                                                  showDialog(
+                                                    context: context,
+                                                    builder: (context) {
+                                                      return const AlertDialog.adaptive(
+                                                        content: Text('삭제 오류'),
+                                                      );
+                                                    },
+                                                  );
+                                                });
+                                          },
                                           icon: const Icon(Icons.delete),
                                         ),
                                       ],
